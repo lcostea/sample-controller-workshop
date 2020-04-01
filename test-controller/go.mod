@@ -5,6 +5,7 @@ module lcostea.io/testcontroller
 go 1.13
 
 require (
+	gopkg.in/src-d/go-git.v4 v4.13.1
 	k8s.io/api v0.18.0
 	k8s.io/apimachinery v0.18.0
 	k8s.io/client-go v0.18.0

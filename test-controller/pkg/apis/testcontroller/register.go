@@ -18,5 +18,5 @@ package knapps
 
 // GroupName is the group name used in this package
 const (
-	GroupName = "testcontroller.lcostea.io"
+	GroupName = "knapps.lcostea.io"
 )

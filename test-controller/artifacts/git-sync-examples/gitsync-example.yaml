@@ -1,0 +1,7 @@
+apiVersion: knapps.lcostea.io/v1alpha1
+kind: GitSync
+metadata:
+  name: gs-example
+spec:
+  url: https://github.com/kubernetes/sample-controller.git
+  path: /Users/liviucostea/personal/go/sample-controller-workshop/repos/sample-controller

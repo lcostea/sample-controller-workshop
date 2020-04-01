@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"time"
 
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -173,7 +175,7 @@ func (c *Controller) processNextWorkItem() bool {
 		// Foo resource to be synced.
 		if err := c.syncHandler(key); err != nil {
 			// Put the item back on the workqueue to handle any transient errors.
-			c.workqueue.AddAfter(key, time.Hour)
+			c.workqueue.AddAfter(key, time.Minute)
 			return fmt.Errorf("error syncing '%s': %s, requeuing", key, err.Error())
 		}
 		// Finally, if no error occurs we Forget this item so it does not
@@ -214,12 +216,17 @@ func (c *Controller) syncHandler(key string) error {
 
 		return err
 	}
-	//add the git clone logic
-	at := time.Now().UTC().Format("2006-01-02T15:04:05")
-	gs.Status.ClonedAt = "Cloned today at: " + at
-	gs.Status.ClonedStatus = "Success"
 
-	return nil
+	err = cloneRepo(gs.Spec.Url, gs.Spec.Path, "master")
+	at := time.Now().UTC().Format("2006-01-02T15:04:05")
+	gs.Status.ClonedAt = "Tried cloning today at: " + at
+	if err != nil {
+		gs.Status.ClonedStatus = "Error: " + err.Error()
+	} else {
+		gs.Status.ClonedStatus = "Success"
+	}
+
+	return err
 }
 
 // enqueueFoo takes a Foo resource and converts it into a namespace/name
@@ -233,4 +240,14 @@ func (c *Controller) enqueueFoo(obj interface{}) {
 		return
 	}
 	c.workqueue.Add(key)
+}
+
+func cloneRepo(httpUrl string, localPath string, targetBranch string) error {
+	_, err := git.PlainClone(localPath, false, &git.CloneOptions{
+		URL:           httpUrl,
+		ReferenceName: plumbing.ReferenceName("refs/heads/" + targetBranch),
+	})
+
+	return err
+
 }
