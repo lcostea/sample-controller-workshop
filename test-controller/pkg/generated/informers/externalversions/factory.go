@@ -27,9 +27,9 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
-	versioned "lcostea.io/test-controller/pkg/generated/clientset/versioned"
-	internalinterfaces "lcostea.io/test-controller/pkg/generated/informers/externalversions/internalinterfaces"
-	samplecontroller "lcostea.io/test-controller/pkg/generated/informers/externalversions/samplecontroller"
+	versioned "lcostea.io/testcontroller/pkg/generated/clientset/versioned"
+	internalinterfaces "lcostea.io/testcontroller/pkg/generated/informers/externalversions/internalinterfaces"
+	testcontroller "lcostea.io/testcontroller/pkg/generated/informers/externalversions/testcontroller"
 )
 
 // SharedInformerOption defines the functional option type for SharedInformerFactory.
@@ -172,9 +172,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Samplecontroller() samplecontroller.Interface
+	Testcontroller() testcontroller.Interface
 }
 
-func (f *sharedInformerFactory) Samplecontroller() samplecontroller.Interface {
-	return samplecontroller.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Testcontroller() testcontroller.Interface {
+	return testcontroller.New(f, f.namespace, f.tweakListOptions)
 }

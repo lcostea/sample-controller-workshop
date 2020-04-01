@@ -3,7 +3,7 @@
 This repository implements a simple controller for watching Foo resources as
 defined with a CustomResourceDefinition (CRD).
 
-**Note:** go-get or vendor this package as `lcostea.io/test-controller`.
+**Note:** go-get or vendor this package as `lcostea.io/testcontroller`.
 
 This particular example demonstrates how to perform basic operations such as:
 
@@ -43,8 +43,8 @@ go about fetching this demo and its dependencies.
 When NOT using go 1.11 modules, you can use the following commands.
 
 ```sh
-go get -d lcostea.io/test-controller
-cd $GOPATH/src/lcostea.io/test-controller
+go get -d lcostea.io/testcontroller
+cd $GOPATH/src/lcostea.io/testcontroller
 godep restore
 ```
 
@@ -69,7 +69,7 @@ populate the `vendor` directory.
 If you are developing Kubernetes according to
 https://github.com/kubernetes/community/blob/master/contributors/guide/github-workflow.md
 then you already have a copy of this demo in
-`kubernetes/staging/src/lcostea.io/test-controller` and its dependencies
+`kubernetes/staging/src/lcostea.io/testcontroller` and its dependencies
 --- including the code generator --- are in usable locations
 (valid for all Go versions).
 
@@ -182,6 +182,6 @@ k8s.io/client-go.
 ## Where does it come from?
 
 `sample-controller` is synced from
-https://github.com/kubernetes/kubernetes/blob/master/staging/src/lcostea.io/test-controller.
+https://github.com/kubernetes/kubernetes/blob/master/staging/src/lcostea.io/testcontroller.
 Code changes are made in that location, merged into k8s.io/kubernetes and
 later synced here.

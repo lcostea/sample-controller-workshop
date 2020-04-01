@@ -28,9 +28,9 @@ import (
 	// Uncomment the following line to load the gcp plugin (only required to authenticate against GKE clusters).
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 
-	clientset "lcostea.io/test-controller/pkg/generated/clientset/versioned"
-	informers "lcostea.io/test-controller/pkg/generated/informers/externalversions"
-	"lcostea.io/test-controller/pkg/signals"
+	clientset "lcostea.io/testcontroller/pkg/generated/clientset/versioned"
+	informers "lcostea.io/testcontroller/pkg/generated/informers/externalversions"
+	"lcostea.io/testcontroller/pkg/signals"
 )
 
 var (
@@ -64,8 +64,7 @@ func main() {
 	exampleInformerFactory := informers.NewSharedInformerFactory(exampleClient, time.Second*30)
 
 	controller := NewController(kubeClient, exampleClient,
-		kubeInformerFactory.Apps().V1().Deployments(),
-		exampleInformerFactory.Samplecontroller().V1alpha1().Foos())
+		exampleInformerFactory.Testcontroller().V1alpha1().GitSyncs())
 
 	// notice that there is no need to run Start methods in a separate goroutine. (i.e. go kubeInformerFactory.Start(stopCh)
 	// Start method is non-blocking and runs all registered informers in a dedicated goroutine.
