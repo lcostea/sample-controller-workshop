@@ -17,13 +17,16 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
@@ -33,7 +36,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 	"k8s.io/klog"
-
+	"lcostea.io/testcontroller/pkg/apis/testcontroller/v1alpha1"
 	clientset "lcostea.io/testcontroller/pkg/generated/clientset/versioned"
 	samplescheme "lcostea.io/testcontroller/pkg/generated/clientset/versioned/scheme"
 	informers "lcostea.io/testcontroller/pkg/generated/informers/externalversions/testcontroller/v1alpha1"
@@ -216,7 +219,9 @@ func (c *Controller) syncHandler(key string) error {
 
 		return err
 	}
-
+	if _, err := os.Stat(gs.Spec.Path); !os.IsNotExist(err) {
+		return nil
+	}
 	err = cloneRepo(gs.Spec.Url, gs.Spec.Path, "master")
 	at := time.Now().UTC().Format("2006-01-02T15:04:05")
 	gs.Status.ClonedAt = "Tried cloning today at: " + at
@@ -225,6 +230,7 @@ func (c *Controller) syncHandler(key string) error {
 	} else {
 		gs.Status.ClonedStatus = "Success"
 	}
+	c.updateGitSyncStatus(gs)
 
 	return err
 }
@@ -243,6 +249,7 @@ func (c *Controller) enqueueFoo(obj interface{}) {
 }
 
 func cloneRepo(httpUrl string, localPath string, targetBranch string) error {
+
 	_, err := git.PlainClone(localPath, false, &git.CloneOptions{
 		URL:           httpUrl,
 		ReferenceName: plumbing.ReferenceName("refs/heads/" + targetBranch),
@@ -250,4 +257,13 @@ func cloneRepo(httpUrl string, localPath string, targetBranch string) error {
 
 	return err
 
+}
+
+func (c *Controller) updateGitSyncStatus(gs *v1alpha1.GitSync) {
+	gsCopy := gs.DeepCopy()
+
+	_, err := c.sampleclientset.TestcontrollerV1alpha1().GitSyncs(gs.Namespace).UpdateStatus(context.TODO(), gsCopy, metav1.UpdateOptions{})
+	if err != nil {
+		klog.Error(err)
+	}
 }
